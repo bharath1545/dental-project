@@ -37,6 +37,19 @@ The API is available at `http://127.0.0.1:8000`; interactive API documentation i
 
 Optional: copy `backend/.env.example` to `backend/.env` and adjust configuration. Environment variables take precedence.
 
+## Deploy as Vercel Services
+
+The root `vercel.json` configures two services in one Vercel project:
+
+- `frontend` serves the Vite SPA at `/`.
+- `backend` serves the FastAPI endpoints at `/api/*`.
+
+Import the repository into Vercel with the repository root as the project root. Vercel builds each service from its configured `root`. Keep the frontend API base URL unset so the browser uses same-origin `/api` requests routed by Vercel. No service binding is configured: the browser calls the public `/api/*` route, and neither server-side service makes a private call to the other.
+
+Set `MODEL_MODE=mock` in the Vercel project environment variables for the demo. Vercel's serverless filesystem is temporary and not shared between function instances. When `VERCEL=1`, this project defaults its SQLite database and uploaded images to `/tmp` so the backend can write during a demo, but scan history and images are **not durable** and may disappear or differ between requests. Do not use this deployment for real patient images. For persistent scans, add a managed database and durable object storage, then adapt the storage layer before relying on history or reports in production.
+
+For local development with Vercel's service router, install the Vercel CLI and run `vercel dev` from the repository root. The existing separate-terminal workflow (`uvicorn` plus `npm run dev`) remains supported.
+
 ### 2. Frontend
 
 ```powershell
